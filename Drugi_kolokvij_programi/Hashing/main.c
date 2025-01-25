@@ -1,11 +1,18 @@
-#include <stdio.h>
+﻿#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #define MAX 100
 double A = 0.618033;
+int collisions = 0;
 
-int devision(int key) {
+struct hash_table {
+	int value;
+	int key;
+};
+typedef struct hash_table HashTable;
+
+int division(int key) {
 	return key % MAX;
 }
 
@@ -99,7 +106,67 @@ int multiplication(int key) {
 	return (int)(MAX * kA_ostatak);
 }
 
+void linear_probing(HashTable* table, int value) {
+	int key = division(value);
+	int tmp = key;
+	if (table[key].value == 0) {
+		table[key].value = value;
+		table[key].key = key;
+	}
+	else {
+		while (table[tmp].value != 0) {
+			collisions++;
+			if (table[tmp].value == value) {
+				return;
+			}
+			tmp = (tmp + 1) % MAX; 
+			if (tmp == key) { 
+				return;
+			}
+		}
+		table[tmp].value = value;
+		table[tmp].key = tmp;
+	}
+}
+
+void quadratic_probing(HashTable* table, int value) {
+	int key = division(value);
+	int tmp = key;
+	int i = 1;
+	if (table[key].value == 0) {
+		table[key].value = value;
+		table[key].key = key;
+	}
+	else {
+		while (table[tmp].value != 0) {
+			collisions++;
+			if (table[tmp].value == value) {
+				return;
+			}
+			tmp = (tmp + i * i) % MAX;
+			i++;
+			if (tmp == key) {
+				return;
+			}
+		}
+		table[tmp].value = value;
+		table[tmp].key = tmp;
+	}
+}
+
 int main() {
-	printf("%d", midsquare(123456));
+	HashTable table[MAX];
+	for (int i = 0; i < MAX; i++) {
+		table[i].value = 0;
+		table[i].key = 0;
+	}
+	quadratic_probing(table, 123);
+	quadratic_probing(table, 223);
+	quadratic_probing(table, 323);
+	quadratic_probing(table, 423);
+	for (int i = 0; i < MAX; i++) {
+		printf("[%d] %d\n", table[i].key, table[i].value);
+	}
+	printf("Broj kolizija: %d\n", collisions);
 	return 0;
 }	
