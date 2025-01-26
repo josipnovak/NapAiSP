@@ -75,9 +75,12 @@ int knuth_morris_pratt(char* uzorak, char* tekst) {
 	int m = strlen(uzorak);
 	int n = strlen(tekst);
 	int i = 0, j = 0;
+	int usporedbe = 0;
 	while (i < n) {
+		usporedbe++;
 		if (uzorak[j] == tekst[i]) {
 			if (j == m - 1) {
+				printf("Number of comparisons: %d\n", usporedbe);
 				return i - (m - 1);
 			}
 			i++; j++;
@@ -88,6 +91,7 @@ int knuth_morris_pratt(char* uzorak, char* tekst) {
 		else
 			i++;
 	}
+	printf("Number of comparisons: %d\n", usporedbe);
 	return -1;
 }
 
@@ -174,11 +178,11 @@ int count_words(TrieNode* root) {
 }
 
 int main() {
-	/*char* uzorak = "abc";
-	char* tekst = "aaabc";
+	char* uzorak = "abcabcabcabc";
+	char* tekst = "abcdabceabcdabce";
 	int* lps = kreiranje_lps(uzorak);
-	printf("%d", knuth_morris_pratt(uzorak, tekst));*/
-	TrieNode* root = (TrieNode*)malloc(sizeof(TrieNode));
+	printf("%d", knuth_morris_pratt(uzorak, tekst));
+	/*TrieNode* root = (TrieNode*)malloc(sizeof(TrieNode));
 	root->value = ' ';
 	for (int i = 0;i < ALPHABET_SIZE;i++) {
 		root->children[i] = NULL;
@@ -191,6 +195,6 @@ int main() {
 	root = insert(root, "LUK");
 	root = insert(root, "LUKOVI");
 	root = insert(root, "LUKOBRAN");
-	printf("%d\n", broji_pocetak_prefiksom(root, "AR"));
+	printf("%d\n", broji_pocetak_prefiksom(root, "AR"));*/
 	return 0;
 }

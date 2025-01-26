@@ -1,4 +1,5 @@
-﻿#include <stdio.h>
+﻿#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -11,6 +12,27 @@ struct hash_table {
 	int key;
 };
 typedef struct hash_table HashTable;
+
+struct hash_table_string {
+	char* value;
+	int key;
+};
+typedef struct hash_table_string HashTableString;
+
+int string_to_int(char* key) {
+	int result = 0;
+	for (int i = 0; i < strlen(key);i++) {
+		result *= 10;
+		result += key[i] - '0';
+	}
+	return result;
+}
+
+char* int_to_string(int key) {
+	static char str[20];
+	sprintf(str, "%d", key);
+	return str;
+}
 
 int division(int key) {
 	return key % MAX;
@@ -40,12 +62,38 @@ int midsquare(int key) {
 	return result;
 }
 
+int midsquare_string(char* key_string) {
+	int key = string_to_int(key_string);
+	int n = broj_znamenki(key);
+	int max = broj_znamenki(MAX - 1);
+	int start_index = (n / 2) - (max / 2);
+	if (start_index < 0)
+		start_index = 0;
+	int result = 0;
+	for (int i = 0; i < max;i++) {
+		int digit = (key / (int)pow(10, n - start_index - 1)) % 10;
+		result = result * 10 + digit;
+		start_index++;
+	}
+	return result;
+}
+
 int fold_shift(int key) {
 	if (key / 10 == 0) return key;
 	if (key == 0) return 0;
 	int bz = broj_znamenki(key);
 	int tmp = key / (int)pow(10, bz - broj_znamenki(MAX - 1));
 	return tmp + fold_shift(key % (int)pow(10, bz - broj_znamenki(MAX - 1)));
+}
+
+int fold_shift_string(char* key) {
+	int key_int = string_to_int(key);
+	printf("%d\n", key_int);
+	if (key_int / 10 == 0) return key_int;
+	if (key_int == 0) return 0;
+	int bz = broj_znamenki(key_int);
+	int tmp = key_int / (int)pow(10, bz - broj_znamenki(MAX - 1));
+	return tmp + fold_shift_string(int_to_string(key_int % (int)pow(10, bz - broj_znamenki(MAX - 1))));
 }
 
 int fold_boundry(char* key) {
@@ -106,6 +154,16 @@ int multiplication(int key) {
 	return (int)(MAX * kA_ostatak);
 }
 
+int multiplication_string(char* key) {
+	int result = 0;
+	for (int i = 0; i < strlen(key); i++) {
+		result += key[i];
+	}
+	double kA = result * A;
+	double kA_ostatak = kA - (int)kA;
+	return (int)(MAX * kA_ostatak);
+}
+
 void linear_probing(HashTable* table, int value) {
 	int key = division(value);
 	int tmp = key;
@@ -154,8 +212,31 @@ void quadratic_probing(HashTable* table, int value) {
 	}
 }
 
+void linear_hashing_string(HashTableString* table, char* value) {
+	int key = multiplication_string(value);
+	int tmp = key;
+	if (table[key].value == NULL) {
+		table[key].value = value;
+		table[key].key = key;
+	}
+	else {
+		while (table[tmp].value != NULL) {
+			collisions++;
+			if (strcmp(table[tmp].value, value) == 0) {
+				return;
+			}
+			tmp = (tmp + 1) % MAX;
+			if (tmp == key) {
+				return;
+			}
+		}
+		table[tmp].value = value;
+		table[tmp].key = tmp;
+	}
+}
+
 int main() {
-	HashTable table[MAX];
+	/*HashTable table[MAX];
 	for (int i = 0; i < MAX; i++) {
 		table[i].value = 0;
 		table[i].key = 0;
@@ -167,6 +248,12 @@ int main() {
 	for (int i = 0; i < MAX; i++) {
 		printf("[%d] %d\n", table[i].key, table[i].value);
 	}
-	printf("Broj kolizija: %d\n", collisions);
+	printf("Broj kolizija: %d\n", collisions);*/
+	HashTableString table[MAX];
+	for (int i = 0; i < MAX; i++) {
+		table[i].value = NULL;
+		table[i].key = 0;
+	}
+	printf("%d\n", midsquare_string("1234"));
 	return 0;
 }	
