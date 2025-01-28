@@ -141,6 +141,22 @@ struct list* spoji_liste(struct list* lista1, struct list* lista2) {
 	return lista1;
 }
 
+struct list* spoji_novo(struct list* lista1, struct list* lista2) {
+	for (int i = 0; i < MAX; i++) {
+		struct element* curr_1 = lista1->header;
+		struct element* curr_2 = lista2->header->next[i];
+		while (curr_2 != NULL) {
+			while (curr_1->next[i] != NULL && curr_1->next[i]->x < curr_2->x)
+				curr_1 = curr_1->next[i];
+			struct element* tmp = curr_2->next[i];
+			curr_2->next[i] = curr_1->next[i];
+			curr_1->next[i] = curr_2;
+			curr_2 = tmp;
+		}
+	}
+	return lista1;
+}
+
 int main() {
 	srand(time(NULL));
 	struct list* lista1 = inicijalizacija();
@@ -154,21 +170,19 @@ int main() {
 	ubaci_novi(lista1, 3);
 
 	struct list* lista2 = inicijalizacija();
-	ubaci_novi(lista2, 5);
-	ubaci_novi(lista2, 60);
-	ubaci_novi(lista2, 12);
+	ubaci_novi(lista2, 50);
+	ubaci_novi(lista2, -60);
+	ubaci_novi(lista2, -12);
 	ubaci_novi(lista2, 80);
-	ubaci_novi(lista2, 100);
+	ubaci_novi(lista2, -100);
 	ubaci_novi(lista2, 110);
-	ubaci_novi(lista2, 20);
+	ubaci_novi(lista2, -20);
 	ubaci_novi(lista2, 30);
 	
 	print_skip_list(lista1);
-	obrisi(lista1, 10);
-	print_skip_list(lista1);
-	//print_skip_list(lista2);
+	print_skip_list(lista2);
 
-	lista1 = spoji_liste(lista1, lista2);
-	//print_skip_list(lista1);
+	lista1 = spoji_novo(lista1, lista2);
+	print_skip_list(lista1);
 	return 0;
 }

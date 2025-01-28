@@ -22,8 +22,7 @@ typedef struct hash_table_string HashTableString;
 int string_to_int(char* key) {
 	int result = 0;
 	for (int i = 0; i < strlen(key);i++) {
-		result *= 10;
-		result += key[i] - '0';
+		result += key[i];
 	}
 	return result;
 }
@@ -36,6 +35,11 @@ char* int_to_string(int key) {
 
 int division(int key) {
 	return key % MAX;
+}
+
+int division_string(char* key) {
+	int key_int = string_to_int(key);
+	return key_int % MAX;
 }
 
 int broj_znamenki(int num) {
@@ -96,7 +100,22 @@ int fold_shift_string(char* key) {
 	return tmp + fold_shift_string(int_to_string(key_int % (int)pow(10, bz - broj_znamenki(MAX - 1))));
 }
 
-int fold_boundry(char* key) {
+int fold_boundry(int key) {
+	int bz = broj_znamenki(key);
+	int dio = bz / 3;
+	int ostatak = bz % 3;
+	int prvi_dio = dio + (ostatak > 0 ? 1 : 0);
+	int drugi_dio = dio + (ostatak > 1 ? 1 : 0);
+	int treci_dio = dio;
+	int lijevo = 0, sredina = 0, desno = 0;
+	lijevo = key / (int)pow(10, bz - prvi_dio);
+	desno = key % (int)pow(10, treci_dio);
+	sredina = (key / (int)pow(10, treci_dio)) % (int)pow(10, drugi_dio);
+	printf("%d %d %d\n", lijevo, sredina, desno);
+	return (lijevo + flip(sredina) + desno)%MAX;
+}
+
+int fold_boundry_string(char* key) {
 	int bz = strlen(key);
 	if (bz < 3) return -1;
 	int dio = bz / 3;
@@ -135,7 +154,7 @@ int fold_boundry(char* key) {
 			desno += key[i] - '0';
 		}
 	}
-	return lijevo + flip(sredina) + desno;
+	return (lijevo + flip(sredina) + desno) % MAX;
 }
 
 int flip(int key) {
@@ -212,8 +231,9 @@ void quadratic_probing(HashTable* table, int value) {
 	}
 }
 
-void linear_hashing_string(HashTableString* table, char* value) {
-	int key = multiplication_string(value);
+void linear_probing_string(HashTableString* table, char* value) {
+	int key = division_string(value);
+	printf("%s: %d\n", value, key);
 	int tmp = key;
 	if (table[key].value == NULL) {
 		table[key].value = value;
@@ -235,25 +255,51 @@ void linear_hashing_string(HashTableString* table, char* value) {
 	}
 }
 
+void quadratic_probing_string(HashTableString* table, char* value) {
+	int key = division_string(value);
+	int tmp = key;
+	int i = 1;
+	if (table[key].value == 0) {
+		table[key].value = value;
+		table[key].key = key;
+	}
+	else {
+		while (table[tmp].value != 0) {
+			collisions++;
+			if (table[tmp].value == value) {
+				return;
+			}
+			tmp = (tmp + i * i) % MAX;
+			i++;
+			if (tmp == key) {
+				return;
+			}
+		}
+		table[tmp].value = value;
+		table[tmp].key = tmp;
+	}
+}
+
 int main() {
-	/*HashTable table[MAX];
+	HashTableString table[MAX];
 	for (int i = 0; i < MAX; i++) {
 		table[i].value = 0;
 		table[i].key = 0;
 	}
-	quadratic_probing(table, 123);
-	quadratic_probing(table, 223);
-	quadratic_probing(table, 323);
-	quadratic_probing(table, 423);
+	quadratic_probing_string(table, "Pero");
+	quadratic_probing_string(table, "Marko");
+	quadratic_probing_string(table, "Josip");
+	quadratic_probing_string(table, "Macak");
+	quadratic_probing_string(table, "Pas");
+	quadratic_probing_string(table, "Macka");
+	quadratic_probing_string(table, "Magistrala");
+	quadratic_probing_string(table, "Karlobag");
+	quadratic_probing_string(table, "Auto");
+	quadratic_probing_string(table, "Pernica");
+	
 	for (int i = 0; i < MAX; i++) {
-		printf("[%d] %d\n", table[i].key, table[i].value);
+		printf("[%d] %s\n", table[i].key, table[i].value);
 	}
-	printf("Broj kolizija: %d\n", collisions);*/
-	HashTableString table[MAX];
-	for (int i = 0; i < MAX; i++) {
-		table[i].value = NULL;
-		table[i].key = 0;
-	}
-	printf("%d\n", midsquare_string("1234"));
+	printf("Broj kolizija: %d\n", collisions);
 	return 0;
 }	

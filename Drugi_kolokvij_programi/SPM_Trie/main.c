@@ -52,7 +52,7 @@ int* kreiranje_lps(char* uzorak) {
 	int len = 0;
 	int i = 1;
 	while (i < strlen(uzorak)) {
-		if (*(uzorak + i) == *(uzorak + len)) {
+		if (uzorak[i] == uzorak[len]) {
 			len++;
 			lps[i] = len;
 			i++;
@@ -179,10 +179,10 @@ int count_words(TrieNode* root) {
 
 int main() {
 	char* uzorak = "abcabcabcabc";
-	char* tekst = "abcdabceabcdabce";
-	int* lps = kreiranje_lps(uzorak);
+	char* tekst = "abcabcabcabce";
 	printf("%d", knuth_morris_pratt(uzorak, tekst));
-	/*TrieNode* root = (TrieNode*)malloc(sizeof(TrieNode));
+	puts("");
+	TrieNode* root = (TrieNode*)malloc(sizeof(TrieNode));
 	root->value = ' ';
 	for (int i = 0;i < ALPHABET_SIZE;i++) {
 		root->children[i] = NULL;
@@ -195,6 +195,6 @@ int main() {
 	root = insert(root, "LUK");
 	root = insert(root, "LUKOVI");
 	root = insert(root, "LUKOBRAN");
-	printf("%d\n", broji_pocetak_prefiksom(root, "AR"));*/
+	print_trie(root);
 	return 0;
 }
